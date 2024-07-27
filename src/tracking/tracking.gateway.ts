@@ -44,7 +44,7 @@ export class TrackingGateway
   @UseGuards(TrackingGatewayGuard)
   async handleConnection(@ConnectedSocket() client: SocketWithAuth) {
     const sockets = this.io.sockets;
-    this.logger.debug(`Socket connectted with userID: ${client.userId}`);
+    this.logger.debug(`Socket connected with userID: ${client.userId}`);
     this.logger.debug(`Number of connected clients: ${sockets.size}`);
 
     if (client.userId === undefined) {
@@ -64,11 +64,19 @@ export class TrackingGateway
     this.logger.debug(
       `Total clients connected to room: '${roomName}': ${connectedClients}`,
     );
-    const updatedLocation = await this.trackingService.getLocation(
-      client.userId,
-    );
 
-    this.io.to(roomName).emit('location_updated', updatedLocation);
+    try {
+      const location = await this.trackingService.getLocation(client.userId);
+      this.io.to(roomName).emit('location_updated', location);
+    } catch (error) {
+      this.logger.error('Error getting or creating location:', error);
+      client.emit(
+        'exception',
+        new WsNotFoundException('Error processing location'),
+      );
+      client.disconnect();
+      return;
+    }
   }
 
   async handleDisconnect(client: SocketWithAuth) {

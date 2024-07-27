@@ -28,9 +28,8 @@
 
 ## Installation
 
-
-
 ## Running the app
+
 1. Clone the project
 
    ```bash
@@ -51,6 +50,7 @@
 ```bash
 $ npm install
 ```
+
 ```bash
 # development
 $ npm run start
@@ -59,10 +59,13 @@ $ npm run start
 
 $ npm run migration:run
 
+#docker compose for run redis
+
+$ docker compose up -d
+
 # watch mode
 $ npm run start:dev
 
 # production mode
 $ npm run start:prod
 ```
-

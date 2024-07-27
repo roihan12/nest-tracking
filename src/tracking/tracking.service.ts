@@ -37,9 +37,15 @@ export class TrackingService {
   }
 
   async getLocation(userId: number): Promise<Tracking> {
-    const tracking = await this.trackingModel.findOne({ userId });
+    let tracking = await this.trackingModel.findOne({ userId });
     if (!tracking) {
-      throw new NotFoundException('User not found');
+      tracking = new this.trackingModel({
+        userId,
+        latitude: 0,
+        longitude: 0,
+        timestamp: new Date(),
+      });
+      await tracking.save();
     }
     return tracking;
   }
